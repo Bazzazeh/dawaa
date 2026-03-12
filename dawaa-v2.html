@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f4c75">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>دواؤك v2 - مذكّر الأدوية الذكي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0f4c75;
+    --primary-light: #1b6ca8;
+    --accent: #00c2cb;
+    --accent2: #ff6b6b;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --text: #1a2332;
+    --text-muted: #6b7a8d;
+    --border: #dde4ed;
+    --shadow: 0 4px 20px rgba(15,76,117,0.12);
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ===== WELCOME SCREEN ===== */
+  #screen-welcome {
+    background: linear-gradient(160deg, #0f4c75 0%, #1b6ca8 50%, #00c2cb 100%);
+    align-items: center;
+    justify-content: center;
+    padding: 40px 30px;
+    text-align: center;
+    gap: 30px;
+  }
+
+  .welcome-icon {
+    width: 110px; height: 110px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.3);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }
+    50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255,255,255,0); }
+  }
+
+  .welcome-title { color: #fff; font-size: 34px; font-weight: 900; line-height: 1.2; }
+  .welcome-sub { color: rgba(255,255,255,0.8); font-size: 16px; font-weight: 400; line-height: 1.6; }
+
+  .input-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .input-group label {
+    color: rgba(255,255,255,0.9);
+    font-size: 15px;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 15px 18px;
+    border-radius: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 17px;
+    outline: none;
+    backdrop-filter: blur(5px);
+    transition: border 0.3s;
+    text-align: right;
+  }
+  .input-field::placeholder { color: rgba(255,255,255,0.5); }
+  .input-field:focus { border-color: rgba(255,255,255,0.8); }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-white { background: #fff; color: var(--primary); }
+  .btn-white:hover { background: #e8f4ff; }
+
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-light); }
+
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-outline {
+    background: transparent;
+    border: 2px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .btn-sm {
+    width: auto;
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  /* ===== HOME SCREEN ===== */
+  #screen-home { background: var(--bg); }
+
+  .header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    padding: 25px 20px 30px;
+    color: #fff;
+    position: relative;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .greeting { font-size: 13px; opacity: 0.8; }
+  .username { font-size: 22px; font-weight: 900; }
+
+  .header-avatar {
+    width: 45px; height: 45px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+  }
+
+  .date-pill {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 13px;
+    backdrop-filter: blur(5px);
+  }
+
+  .content { padding: 20px; flex: 1; overflow-y: auto; }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ===== TODAY PILLS ===== */
+  .today-empty {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+  }
+  .today-empty .big-emoji { font-size: 48px; display: block; margin-bottom: 10px; }
+
+  .med-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+  }
+  .med-item.taken { background: #e8f8f0; border-color: #a8e6c1; }
+  .med-item.overdue { background: #fff0f0; border-color: #ffb3b3; }
+
+  .med-check {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2.5px solid var(--border);
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+  .med-item.taken .med-check { background: var(--success); border-color: var(--success); }
+
+  .med-info { flex: 1; }
+  .med-name { font-size: 15px; font-weight: 700; color: var(--text); }
+  .med-time { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .med-dose { font-size: 12px; color: var(--primary); font-weight: 500; margin-top: 2px; }
+
+  .time-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--primary);
+    color: #fff;
+    white-space: nowrap;
+  }
+  .time-badge.past { background: var(--text-muted); }
+  .time-badge.soon { background: var(--accent2); }
+
+  /* ===== LOW STOCK ALERT ===== */
+  .alert-card {
+    background: linear-gradient(135deg, #fff3cd, #fff8e1);
+    border: 2px solid var(--warning);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .alert-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #856404;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .alert-item {
+    font-size: 14px;
+    color: #664d03;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(133,100,4,0.1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ===== ADD MED SCREEN ===== */
+  #screen-add { background: var(--bg); }
+
+  .screen-header {
+    background: var(--card);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .back-btn {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    border: none;
+    background: var(--bg);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .screen-title { font-size: 18px; font-weight: 700; }
+
+  .form-section { margin-bottom: 20px; }
+
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 16px;
+    color: var(--text);
+    outline: none;
+    transition: border 0.3s;
+    text-align: right;
+  }
+  .form-input:focus { border-color: var(--primary); }
+
+  .times-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .time-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .time-chip button {
+    background: rgba(255,255,255,0.3);
+    border: none;
+    color: #fff;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+
+  .add-time-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .add-time-row .form-input { flex: 1; }
+
+  /* ===== MEDS LIST ===== */
+  #screen-meds { background: var(--bg); }
+
+  .med-card-full {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .med-emoji-big {
+    font-size: 32px;
+    width: 54px; height: 54px;
+    background: var(--bg);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .med-details { flex: 1; }
+  .med-card-name { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .med-card-info { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.6; }
+
+  .stock-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stock-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .stock-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s;
+  }
+  .stock-label { font-size: 12px; font-weight: 700; white-space: nowrap; }
+
+  .med-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  /* ===== END OF DAY MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card);
+    border-radius: 28px 28px 0 0;
+    padding: 30px 24px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideUp 0.35s cubic-bezier(.17,.67,.34,1.05);
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+
+  .modal-title { font-size: 20px; font-weight: 900; margin-bottom: 6px; }
+  .modal-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+
+  .eod-med-row {
+    padding: 14px;
+    background: var(--bg);
+    border-radius: 14px;
+    margin-bottom: 10px;
+  }
+  .eod-med-name { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+
+  .stock-input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .stock-count-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stock-count { flex: 1; text-align: center; font-size: 22px; font-weight: 900; color: var(--primary); }
+
+  /* ===== NAV ===== */
+  .bottom-nav {
+    position: sticky;
+    bottom: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 10px 0 20px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 11px;
+    transition: color 0.2s;
+  }
+  .nav-btn.active { color: var(--primary); }
+  .nav-btn .nav-icon { font-size: 22px; }
+
+  .fab {
+    position: fixed;
+    bottom: 85px;
+    left: 24px;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-size: 28px;
+    box-shadow: 0 6px 20px rgba(0,194,203,0.5);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s;
+    z-index: 50;
+  }
+  .fab:active { transform: scale(0.92); }
+  .fab.hidden { display: none; }
+
+  /* ===== PROFILE SCREEN ===== */
+  #screen-profile { background: var(--bg); }
+
+  .profile-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    padding: 40px 20px 30px;
+    text-align: center;
+    color: #fff;
+  }
+
+  .profile-avatar {
+    width: 80px; height: 80px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 12px;
+    border: 3px solid rgba(255,255,255,0.5);
+  }
+
+  .profile-name { font-size: 24px; font-weight: 900; }
+  .profile-stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 15px;
+  }
+
+  .stat-box {
+    text-align: center;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 10px 20px;
+    backdrop-filter: blur(5px);
+  }
+  .stat-num { font-size: 24px; font-weight: 900; }
+  .stat-label { font-size: 11px; opacity: 0.8; }
+
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+  .setting-label { font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+
+  .toggle {
+    width: 48px; height: 26px;
+    background: var(--border);
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .toggle.on { background: var(--success); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: left 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .toggle.on::after { left: 25px; }
+
+  /* ===== NOTIFICATION BANNER ===== */
+  .notif-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--primary);
+    color: #fff;
+    padding: 15px 20px;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(.17,.67,.34,1.05);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .notif-banner.show { transform: translateY(0); }
+  .notif-text { flex: 1; font-size: 14px; font-weight: 500; }
+  .notif-close { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 50px 30px;
+    color: var(--text-muted);
+  }
+  .empty-state .emoji { font-size: 60px; display: block; margin-bottom: 15px; }
+  .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; line-height: 1.6; }
+
+  select.form-input { -webkit-appearance: none; }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    padding: 0 4px;
+  }
+
+  /* ===== RINGTONE SELECTOR ===== */
+  .ringtone-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .ringtone-btn {
+    padding: 12px 8px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    cursor: pointer;
+    text-align: center;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .ringtone-btn .rt-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+  .ringtone-btn.selected { border-color: var(--primary); background: #e8f4ff; color: var(--primary); }
+  .ringtone-btn:active { transform: scale(0.95); }
+
+  /* ===== QUIET HOURS ===== */
+  .quiet-hours-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .quiet-hours-row .form-input { flex: 1; padding: 12px; }
+  .quiet-sep { font-size: 14px; color: var(--text-muted); font-weight: 700; white-space: nowrap; }
+
+  .volume-slider {
+    width: 100%;
+    margin-top: 8px;
+    accent-color: var(--primary);
+  }
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION BANNER -->
+<div class="notif-banner" id="notifBanner">
+  <span id="notifIcon" style="font-size:22px">💊</span>
+  <span class="notif-text" id="notifText"></span>
+  <button class="notif-close" onclick="closeNotif()">✕</button>
+</div>
+
+<!-- ============ WELCOME SCREEN ============ -->
+<div class="screen active" id="screen-welcome">
+  <div class="welcome-icon">💊</div>
+  <div>
+    <div class="welcome-title">دواؤك</div>
+    <div class="welcome-sub" style="margin-top:8px">مساعدك الشخصي لمتابعة أدويتك<br>بدقة واطمئنان</div>
+  </div>
+  <div class="input-group">
+    <label>ما اسمك؟</label>
+    <input class="input-field" type="text" id="welcomeName" placeholder="اكتب اسمك هنا..." />
+  </div>
+  <button class="btn btn-white" onclick="startApp()">
+    ابدأ الآن ←
+  </button>
+</div>
+
+<!-- ============ HOME SCREEN ============ -->
+<div class="screen" id="screen-home">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="greeting" id="greetingText">صباح الخير،</div>
+        <div class="username" id="headerName">مستخدم</div>
+      </div>
+      <div class="header-avatar" onclick="showScreen('profile')">👤</div>
+    </div>
+    <div class="date-pill" id="dateDisplay">📅 اليوم</div>
+  </div>
+
+  <div class="content">
+    <!-- LOW STOCK ALERTS -->
+    <div id="lowStockAlert" style="display:none" class="alert-card">
+      <div class="alert-title">⚠️ شفلنا يا أسامة! في دوا حيخلص 👇</div>
+      <div id="lowStockItems"></div>
+      <div style="font-size:12px; color:#664d03; margin-top:8px">
+        مشان نقلو لغياث يشتري! 🛒
+      </div>
+    </div>
+
+    <!-- TODAY'S MEDS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">💊 أدوية اليوم</div>
+        <span id="takenCount" style="font-size:13px; color:var(--text-muted)">0/0</span>
+      </div>
+      <div id="todayMedsList">
+        <div class="today-empty">
+          <span class="big-emoji">🌟</span>
+          <div style="font-size:15px; font-weight:600">لا توجد أدوية بعد</div>
+          <div style="font-size:13px; margin-top:6px">اضغط + لإضافة دوائك الأول</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="card" id="progressCard" style="display:none">
+      <div class="card-title" style="margin-bottom:12px">📊 تقدم اليوم</div>
+      <div style="background:var(--bg); border-radius:10px; height:10px; overflow:hidden;">
+        <div id="progressBar" style="height:100%; background:var(--success); border-radius:10px; transition:width 0.5s; width:0%"></div>
+      </div>
+      <div id="progressText" style="font-size:13px; color:var(--text-muted); margin-top:8px; text-align:center"></div>
+    </div>
+  </div>
+
+  <button class="fab" id="fab" onclick="showScreen('add')">+</button>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="navTo('home', this)">
+      <span class="nav-icon">🏠</span> الرئيسية
+    </button>
+    <button class="nav-btn" onclick="navTo('meds', this)">
+      <span class="nav-icon">💊</span> أدويتي
+    </button>
+    <button class="nav-btn" onclick="navTo('profile', this)">
+      <span class="nav-icon">👤</span> حسابي
+    </button>
+  </nav>
+</div>
+
+<!-- ============ ADD MED SCREEN ============ -->
+<div class="screen" id="screen-add">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <div class="screen-title">إضافة دواء جديد</div>
+  </div>
+  <div class="content">
+    <div class="form-section">
+      <label class="form-label">اسم الدواء *</label>
+      <input class="form-input" type="text" id="medName" placeholder="مثال: باراسيتامول 500mg" />
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">الجرعة</label>
+      <input class="form-input" type="text" id="medDose" placeholder="مثال: قرص واحد، 5ml..." />
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">🕐 مواعيد أخذ الدواء</label>
+      <div class="times-container" id="timesContainer"></div>
+      <div class="add-time-row">
+        <input class="form-input" type="time" id="newTime" />
+        <button class="btn btn-primary btn-sm" onclick="addTime()">+ إضافة</button>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">📦 عدد الأقراص/الجرعات المتبقية (للمخزون)</label>
+      <input class="form-input" type="number" id="medStock" placeholder="مثال: 30" min="0" />
+    </div>
+
+    <div class="form-section">
+      <label class="form-label">💊 عدد الجرعات يومياً (لحساب المخزون)</label>
+      <input class="form-input" type="number" id="medDailyCount" placeholder="مثال: 2" min="1" value="1" />
+    </div>
+
+    <button class="btn btn-primary" onclick="saveMed()" style="margin-top:10px">
+      ✅ حفظ الدواء
+    </button>
+    <button class="btn btn-outline" onclick="showScreen('home')" style="margin-top:10px">
+      إلغاء
+    </button>
+  </div>
+</div>
+
+<!-- ============ MEDS LIST SCREEN ============ -->
+<div class="screen" id="screen-meds">
+  <div class="screen-header">
+    <button class="back-btn" onclick="navTo('home', document.querySelectorAll('.nav-btn')[0])">←</button>
+    <div class="screen-title">قائمة أدويتي</div>
+  </div>
+  <div class="content">
+    <div id="allMedsList">
+      <div class="empty-state">
+        <span class="emoji">💊</span>
+        <h3>لا توجد أدوية مضافة</h3>
+        <p>اضغط على زر + في الشاشة الرئيسية لإضافة أدويتك</p>
+      </div>
+    </div>
+  </div>
+  <button class="fab" id="fab2" onclick="showScreen('add')">+</button>
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="navTo('home', this)">
+      <span class="nav-icon">🏠</span> الرئيسية
+    </button>
+    <button class="nav-btn active" onclick="navTo('meds', this)">
+      <span class="nav-icon">💊</span> أدويتي
+    </button>
+    <button class="nav-btn" onclick="navTo('profile', this)">
+      <span class="nav-icon">👤</span> حسابي
+    </button>
+  </nav>
+</div>
+
+<!-- ============ PROFILE SCREEN ============ -->
+<div class="screen" id="screen-profile">
+  <div class="profile-header">
+    <div class="profile-avatar">👤</div>
+    <div class="profile-name" id="profileName">مستخدم</div>
+    <div class="profile-stats">
+      <div class="stat-box">
+        <div class="stat-num" id="statMeds">0</div>
+        <div class="stat-label">دواء</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statTaken">0</div>
+        <div class="stat-label">جرعة اليوم</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-label" style="margin-top:10px">الإعدادات</div>
+    <div style="border-radius:var(--radius); overflow:hidden; background:var(--card); box-shadow:var(--shadow);">
+      <div class="setting-row">
+        <span class="setting-label">🔔 تذكيرات الأدوية</span>
+        <div class="toggle on" id="toggleReminders" onclick="toggleSetting('reminders', this)"></div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">🌙 سؤال نهاية اليوم</span>
+        <div class="toggle on" id="toggleEOD" onclick="toggleSetting('eod', this)"></div>
+      </div>
+      <div class="setting-row" style="border:none">
+        <span class="setting-label">📦 تنبيه نقص المخزون</span>
+        <div class="toggle on" id="toggleStock" onclick="toggleSetting('stock', this)"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px">
+      <button class="btn btn-outline" onclick="triggerEOD()" style="margin-bottom:12px">
+        🌙 تشغيل سؤال نهاية اليوم
+      </button>
+      <button class="btn btn-danger" onclick="resetApp()">
+        🗑️ مسح جميع البيانات
+      </button>
+    </div>
+
+    <!-- RINGTONE SELECTOR -->
+    <div style="margin-top:24px">
+      <div class="section-label">🎵 نغمة التنبيه</div>
+      <div class="card" style="margin-bottom:0">
+        <div class="ringtone-grid" id="ringtoneGrid">
+          <button class="ringtone-btn selected" onclick="selectRingtone('beep', this)">
+            <span class="rt-icon">🔔</span> تنبيه
+          </button>
+          <button class="ringtone-btn" onclick="selectRingtone('chime', this)">
+            <span class="rt-icon">🎵</span> جرس
+          </button>
+          <button class="ringtone-btn" onclick="selectRingtone('urgent', this)">
+            <span class="rt-icon">🚨</span> عاجل
+          </button>
+          <button class="ringtone-btn" onclick="selectRingtone('soft', this)">
+            <span class="rt-icon">🎶</span> ناعم
+          </button>
+          <button class="ringtone-btn" onclick="selectRingtone('pulse', this)">
+            <span class="rt-icon">💓</span> نبضة
+          </button>
+          <button class="ringtone-btn" onclick="selectRingtone('silent', this)">
+            <span class="rt-icon">🔕</span> صامت
+          </button>
+        </div>
+        <div style="margin-top:14px">
+          <div class="form-label">🔊 مستوى الصوت</div>
+          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70" oninput="changeVolume(this.value)">
+          <div style="font-size:12px; color:var(--text-muted); text-align:center" id="volumeLabel">70%</div>
+        </div>
+        <button class="btn btn-outline" onclick="testRingtone()" style="margin-top:12px; font-size:14px">
+          ▶️ اختبار النغمة
+        </button>
+      </div>
+    </div>
+
+    <!-- QUIET HOURS -->
+    <div style="margin-top:24px; margin-bottom:30px">
+      <div class="section-label">🌙 ساعات الهدوء (بدون تنبيهات)</div>
+      <div class="card" style="margin-bottom:0">
+        <div class="setting-row" style="padding:0 0 14px; border:none">
+          <span class="setting-label">تفعيل ساعات الهدوء</span>
+          <div class="toggle" id="toggleQuiet" onclick="toggleSetting('quiet', this)"></div>
+        </div>
+        <div id="quietHoursInputs">
+          <div class="form-label">من الساعة</div>
+          <div class="quiet-hours-row">
+            <input type="time" class="form-input" id="quietFrom" value="22:00" onchange="saveQuietHours()">
+            <span class="quiet-sep">إلى</span>
+            <input type="time" class="form-input" id="quietTo" value="08:00" onchange="saveQuietHours()">
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:8px; text-align:center">
+            لن يصلك أي تنبيه خلال هذه الساعات 😴
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="navTo('home', this)">
+      <span class="nav-icon">🏠</span> الرئيسية
+    </button>
+    <button class="nav-btn" onclick="navTo('meds', this)">
+      <span class="nav-icon">💊</span> أدويتي
+    </button>
+    <button class="nav-btn active" onclick="navTo('profile', this)">
+      <span class="nav-icon">👤</span> حسابي
+    </button>
+  </nav>
+</div>
+
+<!-- ============ END OF DAY MODAL ============ -->
+<div class="modal-overlay" id="eodModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🌙 يا أسامة!</div>
+    <div class="modal-sub">أخدت كل أدويتك ولا لائا؟ 😄 حدّث المخزون هون</div>
+    <div id="eodMedsList"></div>
+    <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+      <button class="btn btn-success" onclick="saveEOD()">✅ حفظ وإغلاق</button>
+      <button class="btn btn-outline" onclick="closeEOD()">إغلاق بدون حفظ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ STATE ============
+let appData = {
+  userName: '',
+  medications: [],
+  takenToday: {},
+  lastEODDate: '',
+  settings: {
+    reminders: true, eod: true, stock: true,
+    quiet: false, quietFrom: '22:00', quietTo: '08:00',
+    ringtone: 'beep', volume: 70
+  }
+};
+
+let newMedTimes = [];
+let reminderIntervals = [];
+let eodStockChanges = {};
+
+// ============ QUIET HOURS ============
+function isQuietHour() {
+  if (!appData.settings.quiet) return false;
+  const now = new Date();
+  const cur = now.getHours() * 60 + now.getMinutes();
+  const [fh, fm] = (appData.settings.quietFrom || '22:00').split(':').map(Number);
+  const [th, tm] = (appData.settings.quietTo || '08:00').split(':').map(Number);
+  const from = fh * 60 + fm;
+  const to = th * 60 + tm;
+  if (from > to) return cur >= from || cur <= to; // crosses midnight
+  return cur >= from && cur <= to;
+}
+
+function saveQuietHours() {
+  appData.settings.quietFrom = document.getElementById('quietFrom').value;
+  appData.settings.quietTo = document.getElementById('quietTo').value;
+  save();
+  showNotif('🌙', 'تم حفظ ساعات الهدوء!');
+}
+
+// ============ RINGTONE ============
+function selectRingtone(type, btn) {
+  appData.settings.ringtone = type;
+  save();
+  document.querySelectorAll('.ringtone-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function testRingtone() {
+  playAlertSound();
+  showNotif('🎵', 'هذه نغمة التنبيه الخاصة بك!');
+}
+
+function changeVolume(val) {
+  appData.settings.volume = parseInt(val);
+  document.getElementById('volumeLabel').textContent = val + '%';
+  save();
+}
+
+// ============ INIT ============
+function init() {
+  const saved = localStorage.getItem('dawaukApp');
+  if (saved) {
+    appData = { ...appData, ...JSON.parse(saved) };
+  }
+
+  if (appData.userName) {
+    showScreen('home');
+    renderHome();
+    scheduleReminders();
+    checkEOD();
+    checkLowStock();
+  }
+
+  // Request notification permission
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function save() {
+  localStorage.setItem('dawaukApp', JSON.stringify(appData));
+}
+
+// ============ SCREENS ============
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+
+  if (name === 'home') renderHome();
+  if (name === 'meds') renderMedsList();
+  if (name === 'profile') renderProfile();
+
+  document.querySelector('.fab')?.classList.toggle('hidden', name !== 'home');
+}
+
+function navTo(name, btn) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  // sync all nav bars
+  const idx = ['home','meds','profile'].indexOf(name);
+  document.querySelectorAll('.bottom-nav').forEach(nav => {
+    nav.querySelectorAll('.nav-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === idx);
+    });
+  });
+  showScreen(name);
+}
+
+// ============ WELCOME ============
+function startApp() {
+  const name = document.getElementById('welcomeName').value.trim();
+  if (!name) {
+    showNotif('⚠️', 'من فضلك أدخل اسمك أولاً');
+    return;
+  }
+  appData.userName = name;
+  save();
+  showScreen('home');
+  renderHome();
+  showNotif('👋', `أهلاً ${name}! يسعدنا وجودك معنا`);
+}
+
+// ============ HOME ============
+function renderHome() {
+  document.getElementById('headerName').textContent = appData.userName;
+  document.getElementById('profileName').textContent = appData.userName;
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'صباح الخير،' : hour < 17 ? 'مساء الخير،' : 'مساء النور،';
+  document.getElementById('greetingText').textContent = greeting;
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('dateDisplay').textContent = '📅 ' + dateStr;
+
+  renderTodayMeds();
+  checkLowStock();
+}
+
+function renderTodayMeds() {
+  const container = document.getElementById('todayMedsList');
+  const todayKey = getTodayKey();
+
+  if (!appData.takenToday[todayKey]) appData.takenToday[todayKey] = {};
+
+  const allDoses = [];
+  appData.medications.forEach(med => {
+    (med.times || []).forEach(time => {
+      allDoses.push({ med, time });
+    });
+  });
+
+  if (allDoses.length === 0) {
+    container.innerHTML = `
+      <div class="today-empty">
+        <span class="big-emoji">🌟</span>
+        <div style="font-size:15px; font-weight:600">لا توجد أدوية بعد</div>
+        <div style="font-size:13px; margin-top:6px">اضغط + لإضافة دوائك الأول</div>
+      </div>`;
+    document.getElementById('progressCard').style.display = 'none';
+    document.getElementById('takenCount').textContent = '0/0';
+    return;
+  }
+
+  allDoses.sort((a, b) => a.time.localeCompare(b.time));
+
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  let takenCount = 0;
+  let html = '';
+
+  allDoses.forEach(({ med, time }) => {
+    const doseKey = `${med.id}_${time}`;
+    const isTaken = appData.takenToday[todayKey][doseKey];
+    if (isTaken) takenCount++;
+
+    const [h, m] = time.split(':').map(Number);
+    const doseMinutes = h * 60 + m;
+    const diff = doseMinutes - nowMinutes;
+    let badgeClass = '', badgeText = '', itemClass = '';
+
+    if (isTaken) {
+      itemClass = 'taken';
+      badgeText = '✓ تم أخذه';
+      badgeClass = '';
+    } else if (diff < -30) {
+      itemClass = 'overdue';
+      badgeText = 'فاتت!';
+      badgeClass = 'past';
+    } else if (diff <= 30) {
+      badgeText = 'قريباً';
+      badgeClass = 'soon';
+    } else {
+      badgeText = formatTime(time);
+    }
+
+    html += `
+      <div class="med-item ${itemClass}" id="dose_${doseKey.replace(/:/g,'_')}">
+        <div class="med-check" onclick="toggleDose('${med.id}', '${time}')">
+          ${isTaken ? '✓' : ''}
+        </div>
+        <div class="med-info">
+          <div class="med-name">${med.name}</div>
+          <div class="med-dose">${med.dose || 'جرعة واحدة'}</div>
+          <div class="med-time">⏰ ${formatTime(time)}</div>
+        </div>
+        <div class="time-badge ${badgeClass}">${isTaken ? '✓ تم' : badgeText}</div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+
+  const total = allDoses.length;
+  document.getElementById('takenCount').textContent = `${takenCount}/${total}`;
+  document.getElementById('progressCard').style.display = 'block';
+  document.getElementById('progressBar').style.width = `${(takenCount / total) * 100}%`;
+  document.getElementById('progressText').textContent =
+    takenCount === total
+      ? '🎉 أحسنت! أخذت جميع أدويتك اليوم'
+      : `تبقى ${total - takenCount} جرعة من أصل ${total}`;
+  document.getElementById('statTaken').textContent = takenCount;
+}
+
+function toggleDose(medId, time) {
+  const todayKey = getTodayKey();
+  if (!appData.takenToday[todayKey]) appData.takenToday[todayKey] = {};
+  const doseKey = `${medId}_${time}`;
+  appData.takenToday[todayKey][doseKey] = !appData.takenToday[todayKey][doseKey];
+
+  // Reduce stock if taken
+  if (appData.takenToday[todayKey][doseKey]) {
+    const med = appData.medications.find(m => m.id === medId);
+    if (med && med.stock > 0) {
+      med.stock--;
+    }
+    showNotif('✅', 'تم تسجيل الجرعة!');
+  }
+
+  save();
+  renderTodayMeds();
+  checkLowStock();
+}
+
+// ============ LOW STOCK ============
+function checkLowStock() {
+  if (!appData.settings.stock) return;
+
+  const lowMeds = appData.medications.filter(med => {
+    if (!med.stock || !med.dailyCount) return false;
+    const daysLeft = med.stock / med.dailyCount;
+    return daysLeft <= 7 && daysLeft > 0;
+  });
+
+  const alertDiv = document.getElementById('lowStockAlert');
+  const itemsDiv = document.getElementById('lowStockItems');
+
+  if (lowMeds.length === 0) {
+    if (alertDiv) alertDiv.style.display = 'none';
+    return;
+  }
+
+  if (alertDiv) alertDiv.style.display = 'block';
+  if (itemsDiv) {
+    itemsDiv.innerHTML = lowMeds.map(m => {
+      const days = Math.floor(m.stock / m.dailyCount);
+      return `<div class="alert-item">💊 ${m.name} — يكفي لـ <strong>${days}</strong> أيام (${m.stock} وحدة)</div>`;
+    }).join('');
+  }
+}
+
+// ============ ADD MED ============
+function addTime() {
+  const timeInput = document.getElementById('newTime');
+  const time = timeInput.value;
+  if (!time) return;
+  if (newMedTimes.includes(time)) {
+    showNotif('⚠️', 'هذا الموعد مضاف بالفعل');
+    return;
+  }
+  newMedTimes.push(time);
+  renderTimesChips();
+  timeInput.value = '';
+}
+
+function removeTime(t) {
+  newMedTimes = newMedTimes.filter(x => x !== t);
+  renderTimesChips();
+}
+
+function renderTimesChips() {
+  const c = document.getElementById('timesContainer');
+  c.innerHTML = newMedTimes.map(t => `
+    <div class="time-chip">
+      ⏰ ${formatTime(t)}
+      <button onclick="removeTime('${t}')">✕</button>
+    </div>`).join('');
+}
+
+function saveMed() {
+  const name = document.getElementById('medName').value.trim();
+  if (!name) { showNotif('⚠️', 'من فضلك أدخل اسم الدواء'); return; }
+  if (newMedTimes.length === 0) { showNotif('⚠️', 'من فضلك أضف موعداً واحداً على الأقل'); return; }
+
+  const med = {
+    id: 'med_' + Date.now(),
+    name,
+    dose: document.getElementById('medDose').value.trim(),
+    times: [...newMedTimes].sort(),
+    stock: parseInt(document.getElementById('medStock').value) || 0,
+    dailyCount: parseInt(document.getElementById('medDailyCount').value) || 1,
+    createdAt: new Date().toISOString()
+  };
+
+  appData.medications.push(med);
+  save();
+
+  // Reset form
+  newMedTimes = [];
+  ['medName','medDose','medStock'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('medDailyCount').value = '1';
+  renderTimesChips();
+
+  scheduleReminders();
+  showNotif('💊', `تم حفظ "${med.name}" بنجاح!`);
+  showScreen('home');
+}
+
+// ============ MEDS LIST ============
+function renderMedsList() {
+  const container = document.getElementById('allMedsList');
+  document.getElementById('statMeds').textContent = appData.medications.length;
+
+  if (appData.medications.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <span class="emoji">💊</span>
+        <h3>لا توجد أدوية مضافة</h3>
+        <p>اضغط على زر + لإضافة أدويتك</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = appData.medications.map(med => {
+    const daysLeft = med.stock && med.dailyCount ? Math.floor(med.stock / med.dailyCount) : null;
+    const stockPct = daysLeft !== null ? Math.min(100, (daysLeft / 30) * 100) : null;
+    const stockColor = !daysLeft ? '#e74c3c' : daysLeft <= 3 ? '#e74c3c' : daysLeft <= 7 ? '#f39c12' : '#2ecc71';
+    const emojis = ['💊','🔵','🔴','🟡','🟢','⚪','🟣'];
+    const emoji = emojis[appData.medications.indexOf(med) % emojis.length];
+
+    return `
+      <div class="med-card-full">
+        <div class="med-emoji-big">${emoji}</div>
+        <div class="med-details">
+          <div class="med-card-name">${med.name}</div>
+          <div class="med-card-info">
+            📋 ${med.dose || 'جرعة واحدة'}<br>
+            ⏰ ${med.times.map(t => formatTime(t)).join(' — ')}
+          </div>
+          ${stockPct !== null ? `
+          <div class="stock-bar-wrap">
+            <div class="stock-bar">
+              <div class="stock-fill" style="width:${stockPct}%; background:${stockColor}"></div>
+            </div>
+            <span class="stock-label" style="color:${stockColor}">${med.stock} وحدة / ${daysLeft} يوم</span>
+          </div>` : ''}
+          <div class="med-actions">
+            <button class="btn btn-primary btn-sm" onclick="editStockPrompt('${med.id}')">📦 تحديث المخزون</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteMed('${med.id}')">🗑️ حذف</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function editStockPrompt(medId) {
+  const med = appData.medications.find(m => m.id === medId);
+  if (!med) return;
+  const newStock = prompt(`كم عدد وحدات "${med.name}" المتبقية؟`, med.stock || 0);
+  if (newStock !== null && !isNaN(newStock)) {
+    med.stock = parseInt(newStock);
+    save();
+    renderMedsList();
+    checkLowStock();
+    showNotif('📦', 'تم تحديث المخزون!');
+  }
+}
+
+function deleteMed(medId) {
+  if (!confirm('هل تريد حذف هذا الدواء؟')) return;
+  appData.medications = appData.medications.filter(m => m.id !== medId);
+  save();
+  renderMedsList();
+  renderTodayMeds();
+  showNotif('🗑️', 'تم حذف الدواء');
+}
+
+// ============ END OF DAY ============
+function checkEOD() {
+  if (!appData.settings.eod) return;
+  const todayKey = getTodayKey();
+  const hour = new Date().getHours();
+  if (hour >= 21 && appData.lastEODDate !== todayKey) {
+    setTimeout(() => triggerEOD(), 2000);
+  }
+}
+
+function triggerEOD() {
+  if (appData.medications.length === 0) {
+    showNotif('ℹ️', 'لا توجد أدوية لمراجعتها');
+    return;
+  }
+
+  eodStockChanges = {};
+  const container = document.getElementById('eodMedsList');
+  container.innerHTML = appData.medications.map(med => {
+    const daysLeft = med.stock && med.dailyCount ? Math.floor(med.stock / med.dailyCount) : '—';
+    eodStockChanges[med.id] = med.stock || 0;
+    return `
+      <div class="eod-med-row">
+        <div class="eod-med-name">💊 ${med.name}
+          <span style="font-size:12px; font-weight:400; color:var(--text-muted)"> — ${daysLeft} يوم متبقي</span>
+        </div>
+        <div class="stock-input-row">
+          <button class="stock-count-btn" onclick="changeEODStock('${med.id}', -1)">−</button>
+          <div class="stock-count" id="eod_${med.id}">${med.stock || 0}</div>
+          <button class="stock-count-btn" onclick="changeEODStock('${med.id}', 1)">+</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('eodModal').classList.add('open');
+}
+
+function changeEODStock(medId, delta) {
+  eodStockChanges[medId] = Math.max(0, (eodStockChanges[medId] || 0) + delta);
+  document.getElementById('eod_' + medId).textContent = eodStockChanges[medId];
+}
+
+function saveEOD() {
+  Object.entries(eodStockChanges).forEach(([medId, stock]) => {
+    const med = appData.medications.find(m => m.id === medId);
+    if (med) med.stock = stock;
+  });
+  appData.lastEODDate = getTodayKey();
+  save();
+  closeEOD();
+  checkLowStock();
+  showNotif('🌙', 'تمام يا أسامة! تسلم! 💪');
+}
+
+function closeEOD() {
+  document.getElementById('eodModal').classList.remove('open');
+}
+
+// ============ REMINDERS ============
+function scheduleReminders() {
+  reminderIntervals.forEach(clearInterval);
+  reminderIntervals = [];
+
+  if (!appData.settings.reminders) return;
+
+  const checkInterval = setInterval(() => {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const currentTime = `${hh}:${mm}`;
+    const todayKey = getTodayKey();
+
+    appData.medications.forEach(med => {
+      if (med.times && med.times.includes(currentTime)) {
+        const doseKey = `${med.id}_${currentTime}`;
+        if (!appData.takenToday[todayKey]?.[doseKey]) {
+          if (!isQuietHour()) {
+            playAlertSound();
+            showNotif('⏰', `أوم خود دواك يا أسامة! 💊 "${med.name}" بينتظرك`);
+            sendBrowserNotif(`⏰ أوم خود دواك يا أسامة!`, `"${med.name}" - ${med.dose || ''}`);
+          }
+        }
+      }
+    });
+
+    // EOD check
+    if (now.getHours() === 21 && now.getMinutes() === 0) {
+      checkEOD();
+    }
+  }, 60000);
+
+  reminderIntervals.push(checkInterval);
+}
+
+function playAlertSound() {
+  const type = appData.settings.ringtone || 'beep';
+  const vol = (appData.settings.volume || 70) / 100;
+  if (type === 'silent') return;
+  try {
+    const ctx = new AudioContext();
+    const gain = ctx.createGain();
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(vol * 0.4, ctx.currentTime);
+
+    const patterns = {
+      beep: [[880,0,0.15],[0,0.15,0.05],[880,0.2,0.15],[0,0.35,0.05],[880,0.4,0.3]],
+      chime: [[523,0,0.3],[659,0.2,0.3],[784,0.4,0.5],[1047,0.6,0.6]],
+      urgent: [[1200,0,0.08],[800,0.1,0.08],[1200,0.2,0.08],[800,0.3,0.08],[1200,0.4,0.08],[800,0.5,0.3]],
+      soft: [[440,0,0.4],[550,0.3,0.4],[660,0.6,0.6]],
+      pulse: [[700,0,0.1],[0,0.15,0.05],[700,0.2,0.1],[0,0.35,0.05],[700,0.4,0.1],[0,0.55,0.05],[700,0.6,0.3]]
+    };
+
+    const notes = patterns[type] || patterns.beep;
+    notes.forEach(([freq, start, dur]) => {
+      if (!freq) return;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = type === 'chime' ? 'sine' : 'square';
+      g.gain.setValueAtTime(vol * 0.3, ctx.currentTime + start);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+      osc.start(ctx.currentTime + start);
+      osc.stop(ctx.currentTime + start + dur + 0.05);
+    });
+  } catch(e) {}
+}
+
+function sendBrowserNotif(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '💊' });
+  }
+}
+
+// ============ PROFILE ============
+function renderProfile() {
+  document.getElementById('profileName').textContent = appData.userName;
+  document.getElementById('statMeds').textContent = appData.medications.length;
+  const todayKey = getTodayKey();
+  const taken = Object.values(appData.takenToday[todayKey] || {}).filter(Boolean).length;
+  document.getElementById('statTaken').textContent = taken;
+
+  // Restore ringtone selection
+  const rt = appData.settings.ringtone || 'beep';
+  document.querySelectorAll('.ringtone-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.getAttribute('onclick').includes(`'${rt}'`));
+  });
+
+  // Restore volume
+  const vol = appData.settings.volume || 70;
+  document.getElementById('volumeSlider').value = vol;
+  document.getElementById('volumeLabel').textContent = vol + '%';
+
+  // Restore quiet hours
+  const quietToggle = document.getElementById('toggleQuiet');
+  quietToggle.classList.toggle('on', !!appData.settings.quiet);
+  document.getElementById('quietFrom').value = appData.settings.quietFrom || '22:00';
+  document.getElementById('quietTo').value = appData.settings.quietTo || '08:00';
+}
+
+function toggleSetting(key, el) {
+  appData.settings[key] = !appData.settings[key];
+  el.classList.toggle('on', appData.settings[key]);
+  save();
+  if (key === 'reminders') scheduleReminders();
+}
+
+function resetApp() {
+  if (confirm('هل تريد مسح جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء.')) {
+    localStorage.removeItem('dawaukApp');
+    location.reload();
+  }
+}
+
+// ============ NOTIFICATIONS ============
+let notifTimeout = null;
+function showNotif(icon, text) {
+  document.getElementById('notifIcon').textContent = icon;
+  document.getElementById('notifText').textContent = text;
+  const banner = document.getElementById('notifBanner');
+  banner.classList.add('show');
+  clearTimeout(notifTimeout);
+  notifTimeout = setTimeout(() => banner.classList.remove('show'), 3500);
+}
+function closeNotif() { document.getElementById('notifBanner').classList.remove('show'); }
+
+// ============ UTILS ============
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function formatTime(time24) {
+  const [h, m] = time24.split(':').map(Number);
+  const suffix = h >= 12 ? 'م' : 'ص';
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2,'0')} ${suffix}`;
+}
+
+// ============ START ============
+init();
+</script>
+</body>
+</html>
